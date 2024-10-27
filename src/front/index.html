@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Shortness</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 50px;
+    }
+    #output {
+      margin-top: 15px;
+      color: green;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>URL Shortness</h1>
+  <input id="url" type="text" placeholder="Enter URL" style="width: 300px; padding: 5px;">
+  <button id="btn" style="padding: 5px 10px; margin-top: 10px;">Short</button>
+  <div id="output"></div>
+
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+    const btn = document.querySelector("#btn");
+    const urlInput = document.getElementById("url");
+    const outputDiv = document.getElementById("output");
+    const apiURL = "http://localhost:3000/";
+
+    btn.addEventListener('click', () => {
+      const urlValue = urlInput.value.trim();
+      if (!urlValue) {
+        outputDiv.textContent = "Please enter a URL!";
+        outputDiv.style.color = "red";
+        return;
+      }
+      
+      const formattedUrl = encodeURIComponent(urlValue);
+
+      axios.post(`${apiURL}short-url/${formattedUrl}`)
+        .then((response) => {
+          outputDiv.textContent = "URL Saved successfully!";
+          outputDiv.style.color = "green";
+        })
+        .catch((error) => {
+          if (error.response && error.response.status === 400) {
+            outputDiv.innerHTML = `Short URL: <a href="${apiURL}${error.response.data.shortUrl}" target="_blank">${apiURL}${error.response.data.shortUrl}</a>`;
+          } else {
+            outputDiv.textContent = "Error saving URL. Please try again.";
+            outputDiv.style.color = "red";
+          }
+          console.log(error);
+        });
+    });
+  </script>
+</body>
+
+</html>
